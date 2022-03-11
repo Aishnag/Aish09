@@ -1,0 +1,129 @@
+******************Jenkins with docker cloud*************************
+
+**********to set up jenkins follow the below steps******************
+
+*********step-1: create AWS ubuntu instance and connect it by using SSH from your local machine & the install ubuntu os***************************************
+
+*********step-2: install jdk****************************************
+
+*********step-3: install maven**************************************
+
+*********step-4: install jenkins************************************
+
+
+
+
+
+
+step-1: install ubuntu on instance
+
+	
+	> sudo apt-get update
+	> sudo apt-get install ca-certificates curl gnupg lsb-release
+	> curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+	> echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+	> sudo apt-get update
+	> sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+
+
+	*****to verify docker installation*****************
+	> sudo docker -v
+			or
+	> sudo docker --version
+			or
+	> sudo docker info
+
+
+
+	******list docker container*********
+	> sudo docker container ls
+			or
+	> sudo docker ps -a
+
+
+
+
+
+
+
+
+step-2: install jdk
+	> sudo apt-get update
+	> sudo apt install default-jdk -y
+
+step-3: install maven
+	> sudo apt install maven -y
+
+step-4: install jenkins
+	Goto>google>how to download jenkins in ubuntu
+
+	> curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+	> echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+	> sudo apt-get update
+	> sudo apt-get install jenkins
+
+	*****start jenkins service*****
+	> sudo service jenkins start
+
+
+	*****to check jenkins service*****
+	> sudo service jenkins status
+
+
+	*****to remove running container*****
+	> sudo docker container rm -f <container id>
+
+
+	*****not mendatory but usefull commands*****
+	> sudo service jenkins stop  ///to stop the service
+	> sudo service jenkins restart
+
+
+	*****to check whther jenkins ins properly installed or not >goto>aws>instance>copy ip:8080*****
+	*****if jenkins starts we are ready to go*****
+
+
+	*****to get secreat adminpassword*****
+	>sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+*****part 2*******
+
+	 
+	*****after generating the key enter the follow command for permission 
+	> sudo chmod 777 /var/run/docker.sock
+
+
+	********03/11/2022*******************************************************
+
+Step5: download DOCKER PLUGIN in jenkins(goto>manage jenkins>plugin>search for docker plugin>install without restart)
+
+Step6 : goto>managejenkins>managenodes and clouds>configure clouds>Docker
+
+	name: docker
+	Host URI: unix:///var/run/docker.sock
+
+step7: click on test connection
+	if error percist run the command again: chmod 777 /var/run/docker.sock
+
+
+step8: new item> name of project> freestyle project> goto build>
+	SOURCE MANAGEMENT: 
+		REPOSITORY URL : https://github.com/Nikunj-Java/docker_master.git
+	BUIL TRIGGERS:		
+		POLL HCM:  H/2 * * * *
+	ADD BUILD STEP:
+		CHOOSE :BUILD / PUBLISH DOCKER IMAGE
+		DIRECTORY OF DOCKER FILE:
+		CLOUD: DOCKER
+		IMAGE:USERNAME/REPOSITORYNAME:${BUILD_NUMBER}
+
+				(NOTE: prepare one new public repository in dockerhub)
+				EG: nikunj0510/jenkinsdemo:${BUILD_NUMBER}
+		ADD REGISTRY CREANTIAL:
+					USERNAME & PASSWORD OF DOCKER
+		CHEKBOX PUSH IMAGE: CLICK
+		clean images: CLICK
+		Attempt to remove images when jenkins deletes the run: CLICK
+	SAVE IT
+	GO TO > DASHBOARD> BUILD THE PROJECT

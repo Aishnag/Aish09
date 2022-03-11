@@ -1,0 +1,21 @@
+*****************to logged into docker hub**********
+> docker login
+
+give userid: 
+give password: 
+
+***if permission is denied follow the below code****
+
+> sudo chmod 666 /var/run/docker.sock
+> docker login
+
+give userid: 
+give password:     (password will not be visible just enter your password as it is)
+
+*****push an image to docker hub*******************************
+
+****eg: docker tag <name of image> <username>/<name of directory - you can give any name>***
+
+> docker tag phpcode nikunj0510/demophpcode
+> docker push nikunj0510/demophpcode
+

@@ -1,0 +1,23 @@
+*****************Container _deployment _using _docker _swarm **********************
+
+> cd docker_master
+> docker build -t phpcode .      /////(. is mendatory)/////phpcode is name of our image
+
+
+******check the image is successfully build or not*******
+> docker images
+
+
+
+********initialising docker swarm cluster and deploying the container to the cluster***********(avoid error)
+
+> docker swarm init
+> docker node ls
+
+
+*******once the node is configured , deploy the custum docker image on docker swarm cluster by below codes****
+
+****Eg: docker service create -p 80:80 --name <any name> <imagename>****
+> docker service create -p 80:80 --name webserver phpcode
+> docker service ls
+> curl localhost:80

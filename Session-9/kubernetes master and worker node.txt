@@ -1,0 +1,391 @@
+
+*********************
+
+step-1 : create a master node -> Ec2 instance -> ubuntu 20.0.4
+1) install docker
+2) install kubernates
+3) disbaling swapp
+4) adding cgroup
+
+
+*******install docker server*******
+
+
+
+*********open MobaXterm*****************
+step-1.change directory to your folder contains your key(downloded at the time of preparing Instance)
+
+
+> cd <drive>:     
+> cd <folder name>/                         
+
+
+*****to check the list of  files available****
+
+> ls
+
+
+****connect your local machine with AWS instance*****
+***goto>aws>instance>select the instance of ubuntu> connect> ssh >copy the example link*******
+
+****Eg :****
+****ssh -i "Nikunj_Docker.pem" ubuntu@ec2-13-127-176-213.ap-south-1.compute.amazonaws.com*****
+
+
+> copy the key into mobaXterm and press enter
+
+
+
+
+
+**********Docker installation on ubuntu os****************** google it and copy the codes 
+
+
+*******link: https://docs.docker.com/engine/install/ubuntu/****
+*****scroll down and copy the codes "install using repository and remove the \ "
+
+
+> sudo apt-get update
+> sudo apt-get install ca-certificates curl gnupg lsb-release
+> curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+> echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+> sudo apt-get update
+> sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+
+
+*****to verify docker installation*****************
+
+> sudo docker -v
+			or
+> sudo docker --version
+			or
+> sudo docker info
+
+
+
+step:2***********install kubernatese in ubuntu os*****************
+****search for install kubernatese in ubuntu click the second link******
+***link : https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
+
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl
+sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+
+
+**** to check kubeadm the version****
+kubeadm version
+
+****to check kubectl version *****
+kubectl version
+
+(ignor the error)
+
+
+step:3******disbaling swapp*********
+
+sudo swapoff -a
+sudo sed -i '/ swap / s/^/#/' /etc/fstab
+
+step:4 *******adding cgroup*********
+
+sudo vim /etc/docker/daemon.json
+
+*****press 'i'****
+*****copy the cbelow code*****
+{
+	"exec-opts": ["native.cgroupdriver=systemd"]
+}
+
+*****press 'Esc'****
+*****type ':wq!' +enter
+
+
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+sudo systemctl restart kubelet
+sudo docker info |grep -i cgroup
+
+
+*****check Cgroup Driver and Version*******
+
+
+step-5:
+
+****now we can cluster *****
+***but before that we need assign unique hosting hostname("master-node")****
+
+sudo hostnamectl set-hostname master-node
+
+
+***goto>aws>instance>reboot  master instance*****
+****connect the master instance again and go to ssh and copy the example file again and copy in mobaXterm and hit enter********
+
+
+
+step:6
+
+******start a kubernates master******(default ip for pod)
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=all
+
+
+
+*****copy token for reference************
+sudo kubeadm join 172.31.47.43:6443 --token 2140wh.6vc4wxvzr87q89pt --discovery-token-ca-cert-hash sha256:23b77d0d5f273eb3d77d43c2af98699e93768b5d9464503cc63a3b4d5b721cb7
+
+
+OUTPUT: eb3d77d43c2af98699e93768b5d9464503cc63a3b4d5b721cb7
+
+*******we are using wave works network (just check if needed)*******
+********https://www.weave.works/docs/net/latest/kubernetes/kube-addon/********
+
+step:7
+
+*******add kubernates master node config (copy entire to mobXterm)*****
+***copy thecodes as directed in mobXterm and paste it one by one****
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+step:8
+
+****apply a pod network to the cluster*****
+export kubever=$(kubectl version | base64 | tr -d '\n')
+
+
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$kubever"
+////////////$ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
+step: 9
+*****to verify everything isrunning perfectly*****
+kubectl get pods --all-namespaces
+
+*****make sure that everyone is running***********if All are running you are good to go****else run the code again and check*********
+
+	step: 10
+
+ 
+	******please start worker node*********
+
+	********open file worker-node.txt & copy the TOKEN**********
+
+
+	step: 11
+
+*****list nodes******
+kubectl get nodes
+
+****it will give error as we have not added any node*****
+
+
+
+
+
+
+
+*************** Start a Wroker Node *****************
+
+
+
+step-1 : create a worker node -> Ec2 instance -> ubuntu 20.0.4
+1) install docker
+2) install kubernates
+3) disbaling swapp
+4) adding cgroup
+
+
+*******install docker server*******
+
+
+
+*********open MobaXterm*****************
+step-1.change directory to your folder contains your key(downloded at the time of preparing Instance)
+
+
+> cd <drive>:     
+> cd <folder name>/                         
+
+
+*****to check the list of  files available****
+
+> ls
+
+
+****connect your local machine with AWS instance*****
+***goto>aws>instance>select the instance of ubuntu> connect> ssh >copy the example link*******
+
+****Eg :****
+****ssh -i "Nikunj_Docker.pem" ubuntu@ec2-13-127-176-213.ap-south-1.compute.amazonaws.com*****
+
+
+> copy the key into mobaXterm and press enter
+
+
+
+
+
+**********Docker installation on ubuntu os****************** google it and copy the codes 
+
+
+*******link: https://docs.docker.com/engine/install/ubuntu/****
+*****scroll down and copy the codes "install using repository and remove the \ "
+
+
+> sudo apt-get update
+> sudo apt-get install ca-certificates curl gnupg lsb-release
+> curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+> echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+> sudo apt-get update
+> sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+
+
+*****to verify docker installation*****************
+
+> sudo docker -v
+			or
+> sudo docker --version
+			or
+> sudo docker info
+
+
+
+step:2***********install kubernatese in ubuntu os*****************
+****search for install kubernatese in ubuntu click the second link******
+***link : https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
+
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl
+sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+
+
+**** to check kubeadm the version****
+kubeadm version
+
+****to check kubectl version *****
+kubectl version
+
+(ignor the error)
+
+
+step:3******disbaling swapp*********
+
+sudo swapoff -a
+sudo sed -i '/ swap / s/^/#/' /etc/fstab
+
+step:4 *******adding cgroup*********
+
+sudo vim /etc/docker/daemon.json
+
+*****press 'i'****
+*****copy the cbelow code*****
+{
+	"exec-opts": ["native.cgroupdriver=systemd"]
+}
+
+*****press 'Esc'****
+*****type ':wq!' +enter
+
+
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+sudo systemctl restart kubelet
+sudo docker info |grep -i cgroup
+
+
+*****check Cgroup Driver and Version*******
+
+
+step-5:
+
+****now we can cluster *****
+***but before that we need assign unique hosting hostname("worker-01")****
+
+sudo hostnamectl set-hostname worker-01
+
+
+***goto>aws>instance>reboot  master instance*****
+****connect the master instance again and go to ssh and copy the example file again and copy in mobaXterm and hit enter********
+
+
+step-6 
+****to join the command copy the token you have generated in the masternode and press enter******
+
+*****for me it is: sudo kubeadm join 172.31.47.43:6443 --token 2140wh.6vc4wxvzr87q89pt --discovery-token-ca-cert-hash sha256:23b77d0d5f273eb3d77d43c2af98699e93768b5d9464503cc63a3b4d5b721cb7
+
+
+******once node is joined go back to master ************************
+
+
+
+
+
+
+**************kubernetes metrics*************************************
+
+
+# install metrics API 
+# check metrics API server
+
+
+******paste below code in master node**********************************
+kubectl top nodes
+
+sudo kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl get deployment metrics-server -n kube-system
+
+
+*****not working********************************************************
+
+*********once serivce is started****************************************
+kubectl get pods --all-namespaces
+
+kubectl logs -n kube-system deploy/metrics-server
+
+kubectl get svc -n kube-system
+kube edit deployment.apss -n kube-system metrics-server
+
+> ping copy theCLUSTER-IP -c 1
+
+> systemctl status kube-apiserver -1
+
+****til here not working************************************************
+
+
+****to deploy your app**************************************************
+sudo docker images
+
+
+****to pull images*******************************************************
+sudo docker pull nikunj0510/nikunj
+
+
+****create a deployment pod
+kubectl run nikunj --image=nikunj0510\nikunj --port=8080
+
+
+*****verify pods***********************************************************
+kubectl get pods
+
+*****create a deplyment service*********************************************
+kubectl expose pod/nikunj --port=8081 --target-port=8081 --type=LoadBalancer
+
+***get services**************************************************************
+
+kubectl get services
+
+
+******************************
+Once the pod is deployed, we can get the Load Balancer URL from springbootapp EKS Service. EKS will automatically configure the Load Balancer in AWS. 
+*******************************
+kubectl describe svc nikunj

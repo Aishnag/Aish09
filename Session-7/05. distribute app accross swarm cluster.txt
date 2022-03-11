@@ -1,0 +1,52 @@
+********************Distribute app accross swarm cluster********************************
+
+> sudo su -
+> vi /etc/hosts
+
+
+press 'i' to insert
+
+192.168.0.1 dockermanager/////enter your instance address 172.31.47.130
+192.168.0.2 dockerworker1//////enter your frinds instance address
+
+
+press >'Esc' 
+type  > :wq!
+press > 'Enter'
+
+> ping dockermanager
+
+*****to stop ping of docker manager******
+> ctr+c
+
+>ping dockerworker1
+
+
+*****to stop dockerworker1********
+> ctr+c
+
+
+
+*****Eg: sudo docker swarm init --advertise-addr <ipaddress of dockermanager>
+> sudo docker swarm init --advertise-addr 172.31.47.130
+
+
+*****if error occured leave the swarm by using following command*********
+
+> sudo docker swarm leave --force
+
+
+*****execute the commang once again************
+
+*****Eg: sudo docker swarm init --advertise-addr <ipaddress of dockermanager>
+> sudo docker swarm init --advertise-addr 172.31.47.130
+
+
+******copy the token and give it to node to join cluster********
+******Eg:my Token is: docker swarm join --token SWMTKN-1-67zhg7geu3lql5guac1l7jqfazimcx7qnodacov633gs145h6v-a462msrcb3k3f2tuhnxeo86zb 172.31.47.130:2377
+
+
+*****goto>aws>instance>securitygroup>copy the name of security group> find security group in EC2 dashboard > goto inbound rules add below rule
+****    select SSH   		TCP   	22    	CUSTOM   0.0.0.0/0     ---------
+****    select ALL ICMP -IPV4 	ICMP  0-65535	CUSTOM 	0.0.0./0     ------------
+****    select CUSTOM 		TCP  	2377	CUSTOM 	0.0.0.0/0	-----------

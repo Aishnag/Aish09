@@ -1,0 +1,134 @@
+1. create ubuntu instance in AWS
+2. download Mobaxterm: https://mobaxterm.mobatek.net/download.html
+
+
+*********open MobaXterm*****************
+1.change directory to your folder contains your key(downloded at the time of preparing Instance)
+
+
+> cd <drive>:     
+> cd <folder name>/                         
+
+
+*****to check the list of  files available****
+
+> ls
+
+
+****connect your local machine with AWS instance*****
+***goto>aws>instance>select the instance of ubuntu> connect> ssh >copy the example link*******
+
+****Eg :****
+****ssh -i "Nikunj_Docker.pem" ubuntu@ec2-13-127-176-213.ap-south-1.compute.amazonaws.com*****
+
+
+> copy the key into mobaCterm and press enter
+
+
+
+
+
+**********Docker installation on ubuntu os****************** google it and copy the codes 
+
+
+*******link: https://docs.docker.com/engine/install/ubuntu/****
+*****scroll down and copy the codes "install using repository and remove the \ "
+
+
+> sudo apt-get update
+> sudo apt-get install ca-certificates curl gnupg lsb-release
+> curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+> echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+> sudo apt-get update
+> sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+
+
+*****to verify docker installation*****************
+
+> sudo docker -v
+			or
+> sudo docker --version
+			or
+> sudo docker info
+
+
+
+******list docker container*********
+> sudo docker container ls
+			or
+> sudo docker ps -a
+
+
+******list docker image******
+> sudo docker images
+
+
+*****list container volume*****
+<sudo docker volume ls
+
+
+
+
+
+***********Register in docker hub and prepare an account : https://hub.docker.com/**************
+
+
+
+
+*******pull docker image from docker hub*******
+
+sudo docker pull ubuntu
+sudo docker pull mysql
+
+
+
+
+******to check list of images********
+> sudo docker images
+
+******to get structure of container ********
+
+> ls
+
+
+******to clone git copy the path of git**********
+***path : git clone https://github.com/Nikunj-Java/docker_master.git
+
+
+> git clone https://github.com/Nikunj-Java/docker_master.git
+> sudo ls
+> cd docker_master
+
+
+
+********to build an image******
+> sudo docker build -t phpcode .             /////(. is mendatory)my image name is phpcode
+
+
+**** to check image is formed or not *********
+> sudo docker images
+
+
+
+******to run image on docker container ********
+
+eg:   > sudo docker run -d --name <container name> -p 80:80 <imagename>
+
+> sudo docker run -d --name Mycontainer -p 80:80 phpcode
+
+
+
+
+**** to check container running*******
+sudo docker ps -a
+
+
+******to check html code *******
+> curl localhost:80
+
+
+
+
+*******goto>aws>instance>select your ubuntu instance>scroll down to bottom and copy the Public IPv4 address
+******goto >any browser paste Public IPv4 address:80
